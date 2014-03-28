@@ -90,7 +90,9 @@ sub GoChessEngine
                 CraftyGo
             end if
         end if
-        sleep 500
+        if( GameMode = GAME_CRAFTY_VS_NAUM ) then
+            sleep 500
+        end if
     end if
 end sub
 
@@ -120,7 +122,11 @@ sub printBoard
                 PutCursor( V, H, 1 )
             end if
                 ' last move
-            if(mvCnt>0 and at_sq = mid( moveHist(mvCnt), 3, 2 )) then
+            dim as string lastm = "x"
+            if(mvCnt>0) then
+                lastm = mid( moveHist,3+((mvCnt-1)*5), 2 )
+            end if
+            if(mvCnt>0 and at_sq = lastm ) then
                 PutCursor( V, H, 2 )
             end if
             
@@ -138,6 +144,7 @@ sub dragClick(V as integer, H as integer)
     if(len(dragMOVE)<4) then    'otherwise doing nothing
     
     if( len(dragMOVE)=2 ) then
+        c0_become_from_engine = ""
         if( c0_D_can_be_moved(dragMOVE,sq) ) then
             if( mid( c0_D_what_at(dragMOVE), 2, 1 )="p" and (V=1 or V=8) ) then
                 c0_become_from_engine = whichPromote( c0_CurColor() )
@@ -147,9 +154,14 @@ sub dragClick(V as integer, H as integer)
     end if
     
     if( len(dragMOVE)=4 ) then
-        mvCnt += 1
-        moveHist(mvCnt) = dragMOVE
         c0_move_to ( mid( dragMOVE, 1, 2 ), mid( dragMOVE, 3, 2 ) )
+        mvCnt += 1
+        moveHist += dragMOVE
+        if( len(c0_become_from_engine)>0 ) then
+            moveHist += c0_become_from_engine
+        else
+            moveHist += " "
+        end if
         GoChessEngine
     else
         if( Instr( "," & c0_get_next_moves(), ("," & sq) )>0 ) then
@@ -233,7 +245,8 @@ sub AdjustGameMode
     end if
     
     if((c0_side>0 and Black_Player = ItsME) or _
-        (c0_side<0 and White_Player = ItsME)) then
+        (c0_side<0 and White_Player = ItsME) or _
+        ((Black_Player<>ItsME) and (White_Player<>ItsME)) ) then
         dim as integer swapz = White_Player     'swap players if mistake
         White_Player = Black_Player
         Black_Player = swapz
@@ -320,10 +333,13 @@ Do
         move = left(move,4)
         if Instr("NBR",c0_become_from_engine)>0 then
             move &= c0_become_from_engine
-        end if
-        mvCnt += 1
-        moveHist(mvCnt) = move
+        end if       
         c0_move_to ( mid( move, 1, 2 ), mid( move, 3, 2 ) )
+        mvCnt += 1
+        moveHist += move
+        if( len(move)<5 ) then
+            moveHist += " "
+        end if
         printBoard
         NaumMove = ""
         CraftyMove = ""
@@ -367,6 +383,7 @@ Do
         dragMOVE = ""
         NaumMove = ""
         mvCnt = 0
+        moveHist = ""
         keyb_V = 9-keyb_V
         keyb_H = 9-keyb_H
         CraftyMove = ""
@@ -382,6 +399,7 @@ Do
         AdjustGameMode
         DispWhoIs
         GoChessEngine
+        sleep 500
     end if
     
     if(fTakeBack and (GameOver or len(dragMOVE)<4) and _
@@ -394,6 +412,11 @@ Do
         if( mvCnt > 0 ) then
             c0_take_back()
             mvCnt -= 1
+            if mvCnt>0 then
+                moveHist = mid(moveHist,1,mvCnt*5)
+            else
+                moveHist = ""
+            end if
             CraftyUndo
             NaumUndo
             if( mvCnt > 0 and _
@@ -401,12 +424,18 @@ Do
                  (c0_sidemoves<0 and Black_Player<>ItsME)) ) then
                 c0_take_back()
                 mvCnt -= 1
+                if mvCnt>0 then
+                    moveHist = mid(moveHist,1,mvCnt*5)
+                else
+                    moveHist = ""
+                end if
                 CraftyUndo
                 NaumUndo
             end if
             GoChessEngine
         end if
         printBoard
+        sleep 500
     end if
     ''If mouseButtons And 2 then key = chr(27)
 

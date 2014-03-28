@@ -1,4 +1,5 @@
 '' This declares interface to ExeHandler
+' http://github.com/Chessforeva/Cpp4chess/tree/master/DLL_for_handling_exe_processes
 
 dim shared add_process as function _
     (byval eName as String, byval eArgs as String) as integer
@@ -49,12 +50,13 @@ Dim shared ChessBoard(8,8) As string
 Dim shared ChessBoReady As integer = 0
 
 ' stores history of chess moves
-Dim shared as string moveHist(200)
+Dim shared as string moveHist
 Dim shared as integer mvCnt = 0
+moveHist = ""
 
 sub StartNaum
     if( not( NaumID>0) ) then
-        NaumID = add_process( exepath( ) & "\naum\naum.exe","")
+        NaumID = add_process( exepath( ) & "\naum\Naum-2.0.exe","")
         if(NaumID>0) then
             put_stdin(NaumID, _
                 "board" + chr(10)+ _
