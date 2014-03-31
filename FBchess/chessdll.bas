@@ -30,7 +30,7 @@ release_all = DyLibSymbol( dll_hndl, "release_all" )
 Dim shared CraftyID As integer = 0
 Dim shared CraftyMove As string
 Dim shared Crafty3reps As integer   ' detects 3 repetitions of position
-Dim shared as integer Crafty_search_depth = 0, Crafty_search_time = 0
+Dim shared as integer Crafty_search_depth = 6, Crafty_search_time = 0
 
 ' Naum public variables
 Dim shared NaumID As integer = 0
@@ -71,12 +71,13 @@ sub StartCrafty
         if(CraftyID>0) then
             put_stdin(CraftyID, _
                 "log off"+chr(10) + _
+                "sd 6"+chr(10) + _
                 "display"+chr(10) + _
-                "sd 4"+chr(10) + _
                 "xboard"+chr(10) )
         end if
     end if
 end sub
+
 
 sub CloseCrafty
     if(CraftyID>0) then
@@ -125,8 +126,11 @@ sub CraftySetStrength( sd as integer, st as integer )
         put_stdin(CraftyID,s + chr(10) + "display"+chr(10))
     end if
 end sub
-
-
+sub CraftyQuit
+    if(CraftyID>0) then
+        put_stdin(CraftyID,"quit"+chr(10))
+    end if
+end sub
 
 sub NaumGo
     if(NaumID>0) then
@@ -163,7 +167,11 @@ sub NaumSetStrength( sd as integer, st as integer )
         put_stdin(NaumID,s + chr(10) + "display"+chr(10))
     end if
 end sub
-
+sub NaumQuit
+    if(NaumID>0) then
+        put_stdin(NaumID,"quit"+chr(10))
+    end if
+end sub
 
 function LineOnly as String
     dim as String c, s = ""

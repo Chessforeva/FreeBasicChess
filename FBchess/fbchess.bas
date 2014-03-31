@@ -442,9 +442,15 @@ Do
     '' till ESC or Close Window
 Loop until ( GameMode=0 ) or (ASC(key) = 27) or (key = chr(255) + "k")  
 
+CloseMusic
+
 ' close both engines
+NaumQuit
+CraftyQuit
+sleep 300
+
+' and close processes if left
 CloseNaum
 CloseCrafty
 
-CloseMusic
-        
+'--- end of the program        
