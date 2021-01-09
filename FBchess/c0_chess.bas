@@ -2,7 +2,6 @@
 '' Board in variables, moves, FEN & PGN functions
 '' A ready code for free usage in any type of project
 '' no clock, no chess engine
-'' Author: grozny0   at  gmail.com
 '' http://chessforeva.blogspot.com
 
 
@@ -721,6 +720,7 @@ if(len(c0_king)>0 and len(c0_rook)>0) then
             c0_position = sReplace(c0_position,c0_rook,c0_rook2)
         end if
 	end if
+	c0_lastmovepawn = 0;
 end if
 
 ''
